@@ -5,6 +5,7 @@
 
 import itertools
 import time
+import random
 
 def flatten(listOfLists):
     "Flatten one level of nesting"
@@ -18,6 +19,13 @@ def flatten_all(listOfLists):
                 yield j
         else:
             yield i
+
+def nth(iterable, n, default=None):
+    "Returns the nth item or a default value"
+    return next(itertools.islice(iterable, n, None), default)
+
+def shuffled(iterable):
+    return random.sample(iterable, len(iterable))
 
 def unit_test1():
     '''Test for flatten & flatten_all
@@ -35,4 +43,5 @@ def unit_test1():
     print time.clock() - st
     
 if __name__ == '__main__':
-    unit_test1()
+#     unit_test1()
+    pass

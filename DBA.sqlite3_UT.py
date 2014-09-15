@@ -1,4 +1,7 @@
 ##encoding=utf8
+##version =py27
+##author  =sanhe
+##date    =2014-09-12
 
 from HSH.DBA.hsh_sqlite3 import Database_schema, prt_all
 import sqlite3
