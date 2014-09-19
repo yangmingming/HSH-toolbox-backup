@@ -3,6 +3,9 @@
 ##author  =sanhe
 ##date    =2014-09-07
 
+'''Usage
+from HSH.DBA.hsh_sqlite3 import Database_schema, iterC, prt_all
+'''
 import sqlite3
 import os
 
@@ -74,10 +77,11 @@ def prt_all(c):
     for row in iterC(c):
         print row
         counter += 1
-    print '一共有 %s 条记录。' % counter
+    print 'Found %s records' % counter
 
 def stable_insertmany(connect, cursor, sqlcmd, records):
     '''INSERT INTO tablename VALUES (%s, %s, ...)
+    Skip all the error record
     '''
     try:
         cursor.executemany(sqlcmd, records)

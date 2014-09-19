@@ -208,7 +208,7 @@ def Char(char, n = 1, dl = 0):
     else:
         raise Exception("method 'Char()' can only take one character.")
 
-def Type_String(text, interval = 0, dl = 0):
+def Type_string(text, interval = 0, dl = 0):
     '''键盘输入字符串，interval是字符间输入时间间隔，单位'秒'
     '''
     Delay(dl)

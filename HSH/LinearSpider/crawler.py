@@ -53,64 +53,42 @@ class Crawler(object):
         if not self.auth: # if no login needed, then self.c = None, then not self.c = True
             ## regular get html, use requests.get
             try:
-                r = requests.get(url, headers = self._gen_header(), timeout = timeout)
-                return r.text # if success, return html
+                response = requests.get(url, headers = self._gen_header(), timeout = timeout)
+                return response.text # if success, return html
             except:
 #                 print '%s time out!' % url # <=== 测试时才用
                 return None # if failed, return none
         else: # if login needed, use self.auth.get
             try:
-                r = self.auth.get(url, headers = self.headers, timeout = timeout)
-                return r.text # if success, return html
+                response = self.auth.get(url, headers = self._gen_header(), timeout = timeout)
+                return response.text # if success, return html
             except:
 #                 print '%s time out!' % url <=== 测试时才用
                 return None # if failed, return none
-            
-class Taskplanner(object):
-    '''Taskplanner crawling model
-    there are two step in linear crawling.
-        1. plan the url tree to crawl. 
-        2. download html and extract data
-        
-    The first step is to find where are those target data locate at. The todo_urllist
-    jsontree is saved at self.todo
-    
-    In the second step, we need to save which url we have been crawled and we
-    already got the data we need. The crawled url list is saved at self.finished
-    '''
-    def __init__(self):
-        self.todo = jsontree.jsontree()
-        self.finished = jsontree.jsontree()
-    
-    def _dump_todo(self, path, fastmode = False, replace = False):
-        '''dump taskplanner.todo to local file.
-        When replace = False, existing local file will not be overwrite. For safety
-        '''
-        dump_jt(self.todo, path, fastmode = fastmode, replace = replace)
 
-    def _dump_finished(self, path, replace = False):
-        '''dump taskplanner.finished to local file.
-        When replace = False, existing local file will not be overwrite. For safety
+    def download(self, url, save_as, timeout = 10):
+        '''把url的文件下载到save_as的位置下
         '''
-        dump_jt(self.finished, path, fastmode = fastmode, replace = replace)
-
-    def _load_todo(self, path):
-        '''load taskplanner.todo data from local file
-        '''
-        if os.path.exists(path): # exists, then load
-            with open(path, 'rb') as f:
-                self.todo = jsontree.loads(f.read())
+        if not self.auth:
+            try:
+                response = requests.get(url, headers = self._gen_header(), timeout = timeout, stream=True)
+                with open(save_as, 'wb') as f:
+                    for block in response.iter_content(1024):
+                        if not block:
+                            break
+                        f.write(block)
+            except:
+                pass
         else:
-            print 'CANNOT load! %s not exists!' % path
-
-    def _load_finished(self, path):
-        '''load taskplanner.fished data from local file
-        '''
-        if os.path.exists(path): # exists, then load
-            with open(path, 'rb') as f:
-                self.finished = jsontree.loads(f.read())
-        else:
-            print 'CANNOT load! %s not exists!' % path
+            try:
+                response = self.auth.get(url, headers = self._gen_header(), timeout = timeout, stream=True)
+                with open(save_as, 'wb') as f:
+                    for block in response.iter_content(1024):
+                        if not block:
+                            break
+                        f.write(block)
+            except:
+                pass
             
 def ignore_iterkeys(dictionary, ignore = ['ref']): # data 在线性爬虫中用于默认储存task.todo的传递信息，详情见Readme.MD
     '''iter dict keys, ignore the key in the "ignore" list'''
