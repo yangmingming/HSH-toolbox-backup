@@ -1,15 +1,15 @@
 ##encoding=utf8
 ##version =py27
 ##author  =sanhe
-##date    =2014-09-11
+##date    =2014-10-06
 
-'''
+"""
 from HSH.DBA.hsh_postgres import iterC, prt_all
-'''
+"""
 import psycopg2
 
 def iterC(cursor, arraysize = 10):
-    'An iterator that uses fetchmany to keep memory usage down'
+    "An iterator that uses fetchmany to keep memory usage down"
     while True:
         results = cursor.fetchmany(arraysize)
         if not results:
@@ -22,12 +22,12 @@ def prt_all(cursor):
     for row in iterC(cursor):
         print row
         counter += 1
-    print 'Found %s records' % counter
+    print "Found %s records" % counter
     
 def stable_insertmany(connect, cursor, sqlcmd, records):
-    '''INSERT INTO tablename VALUES (%s, %s, ...)
+    """INSERT INTO tablename VALUES (%s, %s, ...)
     Skip all the error record
-    '''
+    """
     try:
         c.executemany(cmd, records)
     except psycopg2.IntegrityError:

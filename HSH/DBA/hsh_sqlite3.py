@@ -1,11 +1,11 @@
 ##encoding=utf8
 ##version =py27
 ##author  =sanhe
-##date    =2014-09-07
+##date    =2014-10-06
 
-'''Usage
-from HSH.DBA.hsh_sqlite3 import Database_schema, iterC, prt_all
-'''
+"""Usage
+from HSH.DBA.hsh_sqlite3 import Database_schema, iterC, prt_all, stable_insertmany
+"""
 import sqlite3
 import os
 
@@ -16,23 +16,23 @@ class Table(object):
         self.amount = 0
         
     def __str__(self):
-        tableinfo = 'table name = %s, column number = %s, entry number = %s\n' \
+        tableinfo = "table name = %s, column number = %s, entry number = %s\n" \
                     % (self.name, len(self.columns), self.amount)
-        columnsinfo = ['{0[0]:<10}{0[1]:<20}{0[2]:<10}{0[3]:<10}{0[4]:<20}{0[5]:<10}'.format(('cID', ##字符美化输出
-                                                                                             'COLUMN NAME',
-                                                                                             'TYPE',
-                                                                                             'NOT NULL',
-                                                                                             'dflt_value',
-                                                                                             'IS PRIMARY KEY'))]
+        columnsinfo = ["{0[0]:<10}{0[1]:<20}{0[2]:<10}{0[3]:<10}{0[4]:<20}{0[5]:<10}".format(("cID", ##字符美化输出
+                                                                                             "COLUMN NAME",
+                                                                                             "TYPE",
+                                                                                             "NOT NULL",
+                                                                                             "dflt_value",
+                                                                                             "IS PRIMARY KEY"))]
         for column in self.columns:
-            columnsinfo.append('{0[0]:<10}{0[1]:<20}{0[2]:<10}{0[3]:<10}{0[4]:<20}{0[5]:<10}'.format(column))
-        return '=========================== TABLE info ============================\n' + \
-            tableinfo + '\n'.join(columnsinfo)
+            columnsinfo.append("{0[0]:<10}{0[1]:<20}{0[2]:<10}{0[3]:<10}{0[4]:<20}{0[5]:<10}".format(column))
+        return "=========================== TABLE info ============================\n" + \
+            tableinfo + "\n".join(columnsinfo)
             
 class Database_schema(object): # sqlite3 database schema object
     def __init__(self, dbpath):
         if not os.path.exists(dbpath):
-            raise 'ERROR! database path not exists!!'
+            raise "ERROR! database path not exists!!"
         name, _ = os.path.splitext(os.path.basename(dbpath) ) ## 拆分文件名，得到数据库名
         self.name = name 
         self.tables = dict()
@@ -56,15 +56,15 @@ class Database_schema(object): # sqlite3 database schema object
             self.tables[tablename[0]] = table
             
     def __str__(self):
-        return '========================== DATABASE info ==========================\ndatabase name = "' \
-        + self.name + '"\n=== list of table name ===\n' + '\n'.join(self.tables)
+        return "========================== DATABASE info ==========================\ndatabase name = "" \
+        + self.name + ""\n=== list of table name ===\n" + "\n".join(self.tables)
 
     def __getattr__(self, item):
-        if item not in ['name', 'tables']:
+        if item not in ["name", "tables"]:
             return self.tables[item]
 
 def iterC(cursor, arraysize = 10):
-    'An iterator that uses fetchmany to keep memory usage down'
+    "An iterator that uses fetchmany to keep memory usage down"
     while True:
         results = cursor.fetchmany(arraysize)
         if not results:
@@ -77,12 +77,12 @@ def prt_all(c):
     for row in iterC(c):
         print row
         counter += 1
-    print 'Found %s records' % counter
+    print "Found %s records" % counter
 
 def stable_insertmany(connect, cursor, sqlcmd, records):
-    '''INSERT INTO tablename VALUES (%s, %s, ...)
+    """INSERT INTO tablename VALUES (%s, %s, ...)
     Skip all the error record
-    '''
+    """
     try:
         cursor.executemany(sqlcmd, records)
     except: # failed to batch insert, try normal iteratively insert
@@ -94,8 +94,8 @@ def stable_insertmany(connect, cursor, sqlcmd, records):
     connect.commit()
 
 def unit_test1():
-    '''测试database_schema的功能
-    '''
+    """测试database_schema的功能
+    """
     try:
         conn = sqlite3.connect("records.db")
         c = conn.cursor()
@@ -111,8 +111,8 @@ def unit_test1():
     print db_schema.test
 
 def unit_test2():
-    '''测试stable_insertmany的功能
-    '''
+    """测试stable_insertmany的功能
+    """
     conn = sqlite3.connect(":memory:")
     c = conn.cursor()
     c.execute("CREATE TABLE test (id INTEGER PRIMARY KEY NOT NULL, number INTEGER)")
