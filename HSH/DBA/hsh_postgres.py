@@ -4,8 +4,11 @@
 ##date    =2014-10-06
 
 """
-from HSH.DBA.hsh_postgres import iterC, prt_all
+Import
+    from HSH.DBA.hsh_postgres import iterC, prt_all, stable_insertmany
 """
+
+from __future__ import print_function
 import psycopg2
 
 def iterC(cursor, arraysize = 10):
@@ -20,9 +23,9 @@ def iterC(cursor, arraysize = 10):
 def prt_all(cursor):
     counter = 0
     for row in iterC(cursor):
-        print row
+        print(row)
         counter += 1
-    print "Found %s records" % counter
+    print("Found %s records" % counter)
     
 def stable_insertmany(connect, cursor, sqlcmd, records):
     """INSERT INTO tablename VALUES (%s, %s, ...)

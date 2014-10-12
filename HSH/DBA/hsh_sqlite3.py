@@ -1,11 +1,23 @@
 ##encoding=utf8
-##version =py27
+##version =py27, py34
 ##author  =sanhe
-##date    =2014-10-06
+##date    =2014-10-12
 
-"""Usage
-from HSH.DBA.hsh_sqlite3 import Database_schema, iterC, prt_all, stable_insertmany
 """
+Repack of some useful utility in sqlite3
+    1. print data
+    2. low memory cost iterator for cursor
+    3. print all row in cursor
+    4. handle insert large amount of row
+
+Compatibility:
+    python2, python3
+
+Import:
+    from HSH.DBA.hsh_sqlite3 import Database_schema, iterC, prt_all, stable_insertmany
+"""
+
+from __future__ import print_function
 import sqlite3
 import os
 
@@ -72,11 +84,13 @@ def iterC(cursor, arraysize = 10):
             yield result
             
 def prt_all(c):
+    """equivalent to print row for row in c.fetchall()
+    """
     counter = 0
     for row in iterC(c):
-        print row
+        print(row)
         counter += 1
-    print "Found %s records" % counter
+    print("Found %s records" % counter)
 
 def stable_insertmany(connect, cursor, sqlcmd, records):
     """INSERT INTO tablename VALUES (%s, %s, ...)
@@ -90,41 +104,4 @@ def stable_insertmany(connect, cursor, sqlcmd, records):
                 cursor.execute(sqlcmd, record )
             except:
                 pass
-    connect.commit()
-
-def unit_test1():
-    """测试database_schema的功能
-    """
-    try:
-        conn = sqlite3.connect("records.db")
-        c = conn.cursor()
-        c.execute("CREATE TABLE test (id INTEGER PRIMARY KEY NOT NULL, name TEXT, enroll_date DATE)")
-        c.execute("INSERT INTO test (id, name, enroll_date) VALUES (?, ?, ?)", (1, "Jack", date(2014,8,15)))
-        conn.commit()
-        conn.close()
-    except:
-        print "Something Wrong, please delete 'records.db' then proceed"
-    
-    db_schema = Database_schema("records.db")
-    print db_schema
-    print db_schema.test
-
-def unit_test2():
-    """测试stable_insertmany的功能
-    """
-    conn = sqlite3.connect(":memory:")
-    c = conn.cursor()
-    c.execute("CREATE TABLE test (id INTEGER PRIMARY KEY NOT NULL, number INTEGER)")
-    records = [(1, 10), (3, 10), (5, 10)] # insert some records at begin
-    c.executemany("INSERT INTO test VALUES (?, ?)", records)
-    
-    records = [(2, 10), (3, 10), (4, 10)]
-    stable_insertmany(conn, c, "INSERT INTO test VALUES (?, ?)", records)
-    c.execute("SELECT * FROM test")
-    for row in c.fetchall():
-        print row
-        
-if __name__ == "__main__":
-#     unit_test1()
-    unit_test2()
-    
+    connect.commit()    

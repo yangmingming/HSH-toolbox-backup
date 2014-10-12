@@ -7,6 +7,7 @@
 from HSH.OS.smtf import *
 """
 
+from __future__ import print_function
 import os
 
 def getdirsize(path):
@@ -65,10 +66,10 @@ def get_dirinfo(path):
         raise Exception("%s is not a directory!" % path)
     
 def unit_test():
-    print getdirsize(os.getcwd())
-    print string_SizeInBytes(43428985831)
-#     print getdirsize(r"smtf.py")
-    print get_dirinfo(r"..")
+    print(getdirsize(os.getcwd()) )
+    print(string_SizeInBytes(43428985831) )
+#     print(getdirsize(r"smtf.py") )
+    print(get_dirinfo(r"..") )
     
 if __name__ == "__main__":
     unit_test()

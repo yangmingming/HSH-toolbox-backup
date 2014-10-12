@@ -3,6 +3,8 @@
 ##author  =sanhe
 ##date    =2014-10-06
 
+from __future__ import print_function
+
 def hist(array):
     """
     [CN]对数组进行频率统计
@@ -39,10 +41,10 @@ def match_one(pattern, array, tolerance = 4, verbal = True):
         if text_dist(pattern, text) < min_dist: # if text_dist smaller than previous one, update min_dist
             min_dist, match = text_dist(pattern, text), text
     if verbal: # VERBAL
-        print "pattern = '%s' MATCH array = '%s';, distance = '%s'" % (pattern, match, min_dist)
+        print("pattern = '%s' MATCH array = '%s';, distance = '%s'" % (pattern, match, min_dist) )
     if min_dist > tolerance:
         if verbal: # VERBAL
-            print "'%s' found nothing to match." % pattern
+            print("'%s' found nothing to match." % pattern)
         return None
     else:
         return match
@@ -56,11 +58,11 @@ def find_all_match(primary, array, tolerance = 4, verbal = True):
         match = match_one(key, array, tolerance, verbal = False)
         res[key] = match
     if verbal: # if verbal = True, print comparison
-        for key, match in res.iteritems():
+        for key, match in res.items():
             if match:
-                print "<%s> - <%s>" % (key, match)
+                print("<%s> - <%s>" % (key, match) )
             else:
-                print "\tMATCH NOT FOUND: <%s> - <%s>" % (key, match)
+                print("\tMATCH NOT FOUND: <%s> - <%s>" % (key, match) )
     return res
 
 def unit_test1():
@@ -68,7 +70,7 @@ def unit_test1():
     b = ["employee_name", "enroll_date"]
     for i in a:
         match = match_one(i, b, verbal = False)
-        print "<%s> - <%s>" % (i, match)
+        print("<%s> - <%s>" % (i, match) )
 
 def unit_test2():
     a = ["employee name", "enroll date"]
@@ -76,7 +78,7 @@ def unit_test2():
     matchs = find_all_match(a, b)
     
 if __name__ == "__main__":
-#     unit_test1()
+    unit_test1()
     unit_test2()
     
 

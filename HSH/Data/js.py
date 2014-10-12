@@ -30,22 +30,21 @@ else:
     
 def load_js(fname):
     """load dict object from file"""
-    print("Loading from %s..." % fname)
+    print("\nLoading from %s..." % fname)
     st = time.clock()
     if os.path.exists(fname): # exists, then load
         js = json.load(open(fname, read_mode) )
         print("\tComplete! Elapse %s sec." % (time.clock() - st) )
         return js
     else:
-        print("%s not exists! cannot load!" % fname)
-        print("\tComplete! Elapse %s sec." % (time.clock() - st) )
+        print("\t%s not exists! cannot load! Create an empty dict instead" % fname)
         return dict()
 
 def dump_js(js, fname, fastmode = False, replace = False):
     """dump dict object to file.
     dump without pretty indent can be faster when fastmode = True
     Replace existing file when replace = True"""        
-    print("Dumping to %s..." % fname)
+    print("\nDumping to %s..." % fname)
     
     st = time.clock()
     
@@ -56,7 +55,7 @@ def dump_js(js, fname, fastmode = False, replace = False):
             else:
                 json.dump(js, open(fname, write_mode), sort_keys=True, indent=4,separators=("," , ": ") )
         else: # stop, print error message
-            print("CANNOT WRITE to %s, it's already exists" % fname)
+            print("\tCANNOT WRITE to %s, it's already exists" % fname)
     else: # if not exists, just write to it
         if fastmode: # no sort and indent, do the fastest dumping
             json.dump(js, open(fname, write_mode))
