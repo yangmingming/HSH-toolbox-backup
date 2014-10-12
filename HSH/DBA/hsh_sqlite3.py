@@ -56,8 +56,7 @@ class Database_schema(object): # sqlite3 database schema object
             self.tables[tablename[0]] = table
             
     def __str__(self):
-        return "========================== DATABASE info ==========================\ndatabase name = "" \
-        + self.name + ""\n=== list of table name ===\n" + "\n".join(self.tables)
+        return """========================== DATABASE info ==========================\ndatabase name = %s\n=== list of table name ===\n%s""" % (self.name, ", ".join(self.tables) )
 
     def __getattr__(self, item):
         if item not in ["name", "tables"]:

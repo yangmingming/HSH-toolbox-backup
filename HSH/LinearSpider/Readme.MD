@@ -26,10 +26,10 @@ looks like:
 	{
 		'URL1': 
 				{
-					'ref': () <== what ever you get from url1
+					'ref': { itemname: itemvalue,.= ...} <== what ever you get from url1
 					'URL11':
 							{
-								'ref': {}<== what ever you get from url11
+								'ref': { itemname: itemvalue,.= ...} <== what ever you get from url11
 								'URL111': {...}
 								'URL112': {...}
 							}
@@ -45,5 +45,3 @@ looks like:
 	所以'URL1'对应的值是一个自带'ref': {Referenceinfo} 的字典。然后我们把从URL1爬到的所有
 	子URL都放到URL1的值中。每当我们爬子URL的时候，也以此类推。这样到最后就能形成一个树状的URL结构，
 	而每一级的参考信息都被保存在了'ref': {}中。
-
-[3].

@@ -1,12 +1,29 @@
 ##encoding=utf8
-##version =py27
+##version =py27, py34
 ##author  =sanhe
-##date    =2014-10-06
+##date    =2014-10-12
+
+"""
+This module provides high performance iterator recipes
+best time and memory complexity implementation at all
+
+compatible: python2 and python3
+
+import:
+    from HSH.Data.iterable import flatten, flatten_all, nth, shuffled, grouper, grouper_dict, grouper_list
+"""
 
 import itertools
 import time
 import random
+import sys
 
+is_py2 = (sys.version_info[0] == 2)
+if is_py2:
+    from itertools import ifilterfalse as filterfalse, izip_longest as zip_longest
+else:
+    from itertools import filterfalse, zip_longest
+    
 def flatten(listOfLists):
     "Flatten one level of nesting"
     return itertools.chain.from_iterable(listOfLists)
@@ -32,7 +49,7 @@ def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
     args = [iter(iterable)] * n
-    return itertools.izip_longest(fillvalue=fillvalue, *args)
+    return zip_longest(fillvalue=fillvalue, *args)
 
 def grouper_dict(DICT, n):
     "evenly divide DICTIONARY into fixed-length piece, no filled value if chunk size smaller than fixed-length"
@@ -51,37 +68,3 @@ def grouper_list(LIST, n):
             if i != None:
                 chunk_l.append(i)
         yield chunk_l
-
-def unit_test1():
-    '''Test for flatten & flatten_all
-    '''
-    a = [[1,2,3],[4,[5,6],[7,8]], [9,10]] * 100000
-    b = range(100000)
-    st = time.clock()
-    for i in flatten_all(a):
-        pass
-    print time.clock() - st
-    
-    st = time.clock()
-    for i in b:
-        pass
-    print time.clock() - st
-
-def unit_test2():
-    """Test for grouper, grouper_list, grouper_dict
-    """
-    for chunk in grouper('abcdefg',3):
-        print chunk
-        
-    a = {key: 'hello' for key in xrange(10)} ## test grouper_list
-    for chunk_d in grouper_dict(a, 3):
-        print chunk_d
-        
-    b = xrange(10) # test grouper_dict
-    for chunk_l in grouper_list(b, 3):
-        print chunk_l
-        
-if __name__ == '__main__':
-#     unit_test1()
-    unit_test2()
-    pass

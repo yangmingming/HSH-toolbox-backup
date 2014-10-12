@@ -3,28 +3,47 @@
 ##author  =sanhe
 ##date    =2014-09-07
 
-'''This module pack some useful operations in functions
-'''
+"""
+This module is re-pack of some hashlib utility functions
+    1. md5 a string
+    2. md5 a python object
+    3. md5 a file
 
+compatible: python2 and python3
+
+usage:
+    from HSH.Data.hsh_hashlib import md5_str, md5_obj, md5_file
+"""
+
+from __future__ import print_function
 import hashlib
 import pickle
+import sys
+
+is_py2 = (sys.version_info[0] == 2)
 
 def md5_str(text):
-    '''return md5 value from a STRING
-    '''
+    """return md5 value from a STRING
+    """
     m = hashlib.md5()
-    m.update(text)
+    m.update(text.encode("utf-8"))
     return m.hexdigest()
 
 def md5_obj(obj):
-    '''return md5 value from a PYTHON OBJECT
-    '''
+    """return md5 value from a PYTHON OBJECT
+    """
     m = hashlib.md5()
-    m.update(pickle.dumps(obj) )
+    if is_py2:
+#         print( [pickle.dumps(obj, protocol = 2)] )
+        m.update( pickle.dumps(obj, protocol = 2) )
+    else:
+#         print( [str(pickle.dumps(obj, protocol = 2) )] )
+        m.update( str(pickle.dumps(obj, protocol = 2)).encode('utf-8') )
+        
     return m.hexdigest()
 
 def md5_file(fname, chunk_size = 2**10 ):
-    '''return md5 value from a FILE
+    """return md5 value from a FILE
     Estimate processing time on:
         CPU = i7-4600U 2.10GHz - 2.70GHz, RAM = 8.00 GB
         1 second can process 0.25GB data
@@ -37,17 +56,12 @@ def md5_file(fname, chunk_size = 2**10 ):
     ATTENTION:
         When you md5 a file, if you change the meta data (for example, the title, years information
         in audio, video), then the md5 value gonna change.
-    '''
+    """
     m = hashlib.md5()
-    with open(fname, 'rb') as f:
+    with open(fname, "rb") as f:
         while True:
             data = f.read(chunk_size)
             if not data:
                 break
             m.update(data)
     return m.hexdigest()
-
-if __name__ == '__main__':
-    print md5_str('hello world!')
-    print md5_obj(['1',2,'3',4])
-    print md5_file('_note_hashlib.py')
