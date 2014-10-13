@@ -1,14 +1,38 @@
 ##encoding=utf8
 ##version =py27
 ##author  =sanhe
-##date    =2014-09-12
+##date    =2014-10-12
 
 """smtf (smart folder) is a re-pack of some useful functionality of os
-from HSH.OS.smtf import *
+
+Compatibility:
+    python2, python3
+
+Import:
+    from HSH.OS.smtf import getdirsize, string_SizeInBytes, get_dirinfo
 """
 
 from __future__ import print_function
 import os
+    
+def string_SizeInBytes(size_in_bytes):
+    """make size in bytes human readable. Doesn"t support size greater than 1TB
+    """
+    res, by = divmod(size_in_bytes,1024)
+    res, kb = divmod(res,1024)
+    res, mb = divmod(res,1024)
+    tb, gb = divmod(res,1024)
+    if tb != 0:
+        human_readable_size = "%.2fTB" % (tb + gb/float(1024) )
+    elif gb != 0:
+        human_readable_size = "%.2fGB" % (gb + mb/float(1024) )
+    elif mb != 0:
+        human_readable_size = "%.2fMB" % (mb + kb/float(1024) )
+    elif kb != 0:
+        human_readable_size = "%.2fKB" % (kb + by/float(1024) )
+    else:
+        human_readable_size = "%sKB" % by
+    return human_readable_size
 
 def getdirsize(path):
     """calculate size of a directory
@@ -34,22 +58,6 @@ def getdirsize(path):
     else:
         raise Exception("%s is not a directory!" % path)
     
-def string_SizeInBytes(size_in_bytes):
-    """make size in bytes human readable. Doesn"t support size greater than 1TB
-    """
-    res, by = divmod(size_in_bytes,1024)
-    res, kb = divmod(res,1024)
-    gb, mb = divmod(res,1024)
-    if gb != 0:
-        human_readable_size = "%.2fGB" % (gb + mb/float(1024) )
-    elif mb != 0:
-        human_readable_size = "%.2fMB" % (mb + kb/float(1024) )
-    elif kb != 0:
-        human_readable_size = "%.2fKB" % (kb + by/float(1024) )
-    else:
-        human_readable_size = "%sKB" % by
-    return human_readable_size
-
 def get_dirinfo(path):
     """Return the following informations
     how many files, how many folder, size on disk
@@ -64,12 +72,3 @@ def get_dirinfo(path):
         return count_files, count_folders, total
     else:
         raise Exception("%s is not a directory!" % path)
-    
-def unit_test():
-    print(getdirsize(os.getcwd()) )
-    print(string_SizeInBytes(43428985831) )
-#     print(getdirsize(r"smtf.py") )
-    print(get_dirinfo(r"..") )
-    
-if __name__ == "__main__":
-    unit_test()

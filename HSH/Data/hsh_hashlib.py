@@ -42,6 +42,19 @@ def md5_obj(obj):
         
     return m.hexdigest()
 
+def md5_obj(obj):
+    """return md5 value from a PYTHON OBJECT
+    """
+    m = hashlib.md5()
+    if is_py2:
+#         print( [pickle.dumps(obj, protocol = 2)] )
+        m.update( pickle.dumps(obj, protocol = 2) )
+    else:
+#         print( [str(pickle.dumps(obj, protocol = 2) )] )
+        m.update( str(pickle.dumps(obj, protocol = 2)).encode('utf-8') )
+        
+    return m.hexdigest()
+
 def md5_file(fname, chunk_size = 2**10 ):
     """return md5 value from a FILE
     Estimate processing time on:
