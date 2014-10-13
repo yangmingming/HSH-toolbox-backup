@@ -1,7 +1,7 @@
 ##encoding=utf8
 ##version =py27
 ##author  =sanhe
-##date    =2014-09-12
+##date    =2014-10-13
 
 from __future__ import print_function
 from HSH.Data.js import load_js, dump_js, prt_js
