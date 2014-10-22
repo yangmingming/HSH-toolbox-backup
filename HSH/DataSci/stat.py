@@ -10,6 +10,24 @@ Import:
 from __future__ import print_function
 import numpy as np
 
+def find_outlier(np_array, outlier_criterion = 2):
+    """return outliers in np_array
+    [Args]
+    ------
+    np_array: numpy.array data sample
+    
+    outlier_criterion: sample with n of standard deviation bias 
+        from mean value will be considered as outlier
+    
+    [Returns]
+    ---------
+    outliers in np_array
+    """
+    if type(np_array) != np.array:
+        np_array = np.array(np_array)
+    m, std = np_array.mean(), np_array.std()
+    return np_array[ np.where( abs(np_array - m) > outlier_criterion * std )]
+
 def clear_outlier_onetime(np_array, outlier_criterion = 2):
     """return the np_array with removing outliers
     [Args]
@@ -20,6 +38,7 @@ def clear_outlier_onetime(np_array, outlier_criterion = 2):
         from mean value will be considered as outlier
     
     [Returns]
+    ---------
     np_array with all outliers deleted
     """
     if type(np_array) != np.array:
@@ -30,6 +49,16 @@ def clear_outlier_onetime(np_array, outlier_criterion = 2):
 def clear_outlier_literally(np_array, outlier_criterion = 2):
     """return the np_array with recurrsively removing outliers
     until there's no outliers at all
+    [Args]
+    ------
+    np_array: numpy.array data sample
+    
+    outlier_criterion: sample with n of standard deviation bias 
+        from mean value will be considered as outlier
+    
+    [Returns]
+    ---------
+    np_array with all outliers deleted
     """
     if type(np_array) != np.array:
         np_array = np.array(np_array)

@@ -68,18 +68,27 @@ import pandas as pd
 import knn_classifier
 
 def psm(control, treatment, usecol = None, stratified_col = None, k = 1, enable_log = False):
-    """
+    """Propensity score matching using stratification matching
     [Args]
     ------
-    control: [sample_1, sample_2, ..., sample_n]
+    control: control group data
+        control = [sample_1, sample_2, ..., sample_n]
         sample = [feature1, feature2, ..., feature_k]
     
-    treatment: [sample_1, sample_2, ..., sample_n]
+    treatment: treatment group data
+        treatment = [sample_1, sample_2, ..., sample_n]
         sample = [feature1, feature2, ..., feature_k]
+    
+    usecol: the columns indices we will use for matching
+        e.g. [index1, index2, ...]
         
     k: number of matching sample
         how many samples been matching from control group
         for each sample in treatment
+        
+    enable_log: whether you want to write matching results
+        to log file
+
     """
     if usecol: # select the columns we gonna use
         control, treatment = (control.transpose()[usecol].transpose(),
@@ -87,15 +96,16 @@ def psm(control, treatment, usecol = None, stratified_col = None, k = 1, enable_
         
     std_control, std_treatment = knn_classifier.prep_standardize(control, treatment) # pre-processing standardization
     
-    _, indices = knn_classifier.knn_find(std_control, 
+    _, indices = knn_classifier.knn_find(std_control, # find knn neighbors indices
                                          std_treatment, 
                                          k = len(std_control) ) # 更大的k值能保证确保匹配到足够的control sample
     
+    ### process index; select first kth neighbors for each treatment sample
     if enable_log:
-        log = Log()
-        ## 处理index
-        subcontrol_indice = set()
-        for indice, t_sample in zip(indices, treatment): # indice = each sample
+        log = Log() # initial log
+        subcontrol_indice = set() # initial selected control group sample indices
+        
+        for indice, t_sample in zip(indices, treatment): # t_sample = each treatment sample
             matched_i = list() # 每一个treatment sample 所匹配到的list of control samples
             
             for ind in indice:
@@ -103,7 +113,8 @@ def psm(control, treatment, usecol = None, stratified_col = None, k = 1, enable_
                     subcontrol_indice.add(ind) 
                     matched_i.append(ind)
                     if len(matched_i) == k: # 对该treatment已经匹配到了足够的control samples
-                        log.write("%s --matching-- %s" % (t_sample, control[matched_i]), enable_verbose=False)
+                        log.write("%s --matching-- %s" % (t_sample, control[matched_i].tolist()), 
+                                  enable_verbose=False) #
                         break
                 
         return control[list(subcontrol_indice)]
