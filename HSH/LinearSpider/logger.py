@@ -53,7 +53,7 @@ class Log(object):
         else:
             print("DELETE operation canceled.")
             
-    def write(self, index, message):
+    def write(self, message, index = "unknown", enable_verbose = True):
         """
         [EN]Write line to local log file. And automatically print log info
         log line format:
@@ -65,6 +65,7 @@ class Log(object):
         line = "<%s><%s><%s>\n" % (datetime.datetime.now(),
                                    index,
                                    message)
-        print("\t log = %s" % line) # print log info
         with open(os.path.join(self.directory, self.fname), "a") as f:
             f.write(line)
+        if enable_verbose:
+            print("\tlog = %s" % line) # print log info

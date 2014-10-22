@@ -5,6 +5,7 @@
 
 from __future__ import print_function
 from HSH.Data.iterable import flatten, flatten_all, nth, shuffled, grouper, grouper_dict, grouper_list
+from HSH.Data.iterable import running_windows, cycle_running_windows, cycle_slice
 import time
 
 def unit_test1():
@@ -40,7 +41,41 @@ def unit_test2():
     b = range(10) # test grouper_dict
     for chunk_l in grouper_list(b, 3):
         print("\t", chunk_l)
+
+def unit_test3():
+    """Test for nth
+    """
+    n = 1000000
+    array = [i for i in range(n)]
+    st = time.clock()
+    for i in range(100, n):
+        a = array[i]
+    print(time.clock() - st)
+    
+    st = time.clock()
+    for i in array[100:]:
+        a = i
+    print(time.clock() - st)
+#     st = time.clock()
+#     for i in range(n):
+#         b = nth(array, i)
+#     print(time.clock() - st)
         
+def unit_test4():
+    array = [1,2,3,4,5,6,7,8,9,10]
+    print("Testing running windows")
+    for i in running_windows(array,3):
+        print(i)
+        
+    print("Testing cycle running windows")
+    for i in cycle_running_windows(array, 3):
+        print(i)
+    
+    print(cycle_slice(array, 3, 6) )
+    print(cycle_slice(array, 6, 3) )
+                
 if __name__ == "__main__":
-    unit_test1()
-    unit_test2()
+#     unit_test1()
+#     unit_test2()
+#     unit_test3()
+    unit_test4()

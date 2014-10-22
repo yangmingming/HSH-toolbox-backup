@@ -11,8 +11,9 @@ compatible: python2 and python3
 
 import:
     from HSH.Data.iterable import flatten, flatten_all, nth, shuffled, grouper, grouper_dict, grouper_list
+    from HSH.Data.iterable import running_windows, cycle_running_windows, cycle_slice
 """
-
+import collections
 import itertools
 import time
 import random
@@ -68,3 +69,42 @@ def grouper_list(LIST, n):
             if i != None:
                 chunk_l.append(i)
         yield chunk_l
+
+def running_windows(iterable, size):
+    """generate n-size running windows
+    e.g. iterable = [1,2,3,4,5], size = 3
+    yield: [1,2,3], [2,3,4], [3,4,5]
+    """
+    fifo = collections.deque(maxlen=size)
+    for i in iterable:
+        fifo.append(i)
+        if len(fifo) == size:
+            yield list(fifo)
+            
+def cycle_running_windows(iterable, size):
+    """generate n-size cycle running windows
+    e.g. iterable = [1,2,3,4,5], size = 2
+    yield: [1,2], [2,3], [3,4], [4,5], [5,1]
+    """
+    fifo = collections.deque(maxlen=size)
+    cycle = itertools.cycle(iterable)
+    counter = itertools.count(1)
+    length = len(iterable)
+    for i in cycle:
+        fifo.append(i)
+        if len(fifo) == size:
+            yield list(fifo)
+            if next(counter) == length:
+                break
+
+def cycle_slice(array, start, end):
+    """given a list, return right hand cycle direction slice from start to end
+    e.g.
+        array = [0,1,2,3,4,5,6,7,8,9]
+        cycle_slice(array, 4, 7) -> [4,5,6,7]
+        cycle_slice(array, 8, 2) -> [8,9,0,1,2]
+    """
+    if end >= start:
+        return array[start:end+1]
+    else:
+        return array[start:] + array[:end+1]
