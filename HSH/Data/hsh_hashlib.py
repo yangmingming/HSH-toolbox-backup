@@ -21,7 +21,11 @@ import pickle
 import sys
 
 is_py2 = (sys.version_info[0] == 2)
-
+if is_py2:
+    pickle_protocol = 2
+else:
+    pickle_protocol = 3
+    
 def md5_str(text):
     """return md5 value from a STRING
     """
@@ -35,10 +39,10 @@ def md5_obj(obj):
     m = hashlib.md5()
     if is_py2:
 #         print( [pickle.dumps(obj, protocol = 2)] )
-        m.update( pickle.dumps(obj, protocol = 2) )
+        m.update( pickle.dumps(obj, protocol = pickle_protocol) )
     else:
 #         print( [str(pickle.dumps(obj, protocol = 2) )] )
-        m.update( str(pickle.dumps(obj, protocol = 2)).encode('utf-8') )
+        m.update( str(pickle.dumps(obj, protocol = pickle_protocol)).encode('utf-8') )
         
     return m.hexdigest()
 
@@ -48,10 +52,10 @@ def md5_obj(obj):
     m = hashlib.md5()
     if is_py2:
 #         print( [pickle.dumps(obj, protocol = 2)] )
-        m.update( pickle.dumps(obj, protocol = 2) )
+        m.update( pickle.dumps(obj, protocol = pickle_protocol) )
     else:
 #         print( [str(pickle.dumps(obj, protocol = 2) )] )
-        m.update( str(pickle.dumps(obj, protocol = 2)).encode('utf-8') )
+        m.update( str(pickle.dumps(obj, protocol = pickle_protocol)).encode('utf-8') )
         
     return m.hexdigest()
 

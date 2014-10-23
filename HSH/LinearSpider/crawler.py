@@ -119,6 +119,6 @@ def ignore_itervalues(dictionary, ignore = ["ref"]):
             
 def ignore_iteritems(dictionary, ignore = ["ref"]):
     """iter dict keys, ignore the key in the "ignore" list"""
-    for key, value in dictionary.iteritems():
+    for key in dictionary:
         if key not in ignore:
-            yield key, value
+            yield key, dictionary[key]

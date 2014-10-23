@@ -1,7 +1,7 @@
 ##encoding=utf8
-##version =py27, py34
+##version =py27, py33
 ##author  =sanhe
-##date    =2014-10-12
+##date    =2014-10-22
 
 """
 This module is re-pack of some json utility functions

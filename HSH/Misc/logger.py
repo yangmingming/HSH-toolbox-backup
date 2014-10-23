@@ -7,10 +7,10 @@
 能很轻易的把捕获到的异常和自定义错误信息写入到日志中
     
 Compatible:
-    py27, py34
+    py27, py33
 
 Import:
-    from HSH.LinearSpider.logger import Log
+    from HSH.Misc.logger import Log
 """
 
 from __future__ import print_function
@@ -68,4 +68,4 @@ class Log(object):
         with open(os.path.join(self.directory, self.fname), "a") as f:
             f.write(line)
         if enable_verbose:
-            print("\tlog = %s" % line) # print log info
+            print(message) # print log info
