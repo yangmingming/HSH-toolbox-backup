@@ -1,3 +1,8 @@
+##encoding=utf8
+"""
+If you run this file as the main script.
+Then package "HSH" will be installed for all Python version you have installed
+"""
 from __future__ import print_function
 
 __all__ = ["LinearSpider"]

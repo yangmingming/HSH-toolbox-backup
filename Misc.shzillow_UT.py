@@ -8,10 +8,15 @@ from HSH.Misc.shzillow import  zillow_property_detail
 from HSH.Misc.logger import Log
 
 if __name__ == "__main__":
-    log = Log()
+#     log = Log()
+#     try:
+#         result = zillow_property_detail("18727 DUKE LAKE DR", "77383")
+#         print(result)
+#     except Exception as e:
+#         log.write(e, e.index)
+    
+    address, zipcode = "5522 SEQUIN DR", "77388"
     try:
-        result = zillow_property_detail("18727 DUKE LAKE DR", "77388", enable_logger = True)
-        print(result)
+        print(zillow_property_detail(address, zipcode))
     except Exception as e:
         print(e)
-        print(e.index)
