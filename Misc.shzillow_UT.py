@@ -5,7 +5,7 @@
 
 from __future__ import print_function
 from HSH.Misc.shzillow import  zillow_property_detail
-from HSH.Misc.logger import Log
+# from HSH.Misc.logger import Log
 
 if __name__ == "__main__":
     address, zipcode = "5522 SEQUIN DR", "77388"

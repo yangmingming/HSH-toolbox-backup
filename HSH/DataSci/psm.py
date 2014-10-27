@@ -1,7 +1,7 @@
 ##encoding=utf8
 ##version =py27, py33
 ##author  =sanhe
-##date    =2014-10-15
+##date    =2014-10-27
 
 """
 ============================================
@@ -65,12 +65,13 @@ from __future__ import print_function
 from ..Misc.logger import Log
 from ..Data.iterable import flatten_all
 from .knn_classifier import dist, knn_find, prep_standardize
-import pandas as pd
+import numpy as np
+import pandas as pd 
 
 log = Log()
 
 def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
-    """Propensity score matching using stratification matching
+    """Propensity score matching using Knn matching
     [Args]
     ------
     control: control group data
@@ -90,11 +91,14 @@ def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
 
     enable_log: whether you want to write matching results
         to log file
-
+        
+    [Returns]
+    ---------
+    Matched control group samples
     """
     if usecol: # select the columns we gonna use
-        control, treatment = (control.transpose()[usecol].transpose(),
-                              treatment.transpose()[usecol].transpose() )
+        control, treatment = (control.T[usecol].T,
+                              treatment.T[usecol].T )
         
     std_control, std_treatment = prep_standardize(control, treatment) # pre-processing standardization
     
@@ -102,7 +106,10 @@ def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
                           std_treatment, 
                           k = len(std_control) ) # 更大的k值能保证确保匹配到足够的control sample
     
-    ### process index; select first kth neighbors for each treatment sample
+    """process index; select first kth neighbors for each treatment sample
+    根据treatment group中的matching优先index进行汇总，去重。得到整个matching的对照组数据
+    """
+    
     subcontrol_indice = set() # initial selected control group sample indices
     
     for indice, t_sample in zip(indices, treatment): # t_sample = each treatment sample
@@ -121,62 +128,139 @@ def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
     return control[list(subcontrol_indice)]
 
 def psm_stratify(control, treatment, k, usecol = None, stratified_col = None, enable_log = False):
+    """Propensity score matching using stratification matching
+    [Args]
+    ------
+    control: control group data
+        control = [sample_1, sample_2, ..., sample_n]
+        sample = [feature1, feature2, ..., feature_k]
+    
+    treatment: treatment group data
+        treatment = [sample_1, sample_2, ..., sample_n]
+        sample = [feature1, feature2, ..., feature_k]
+    
+    k: number of matching sample
+        how many samples been matching from control group
+        for each sample in treatment
+        
+    usecol: the columns indices we will use for matching
+        e.g. [index1, index2, ...]
+    
+    stratified_col:
+        e.g. stratified_col = [3, 1]
+        so we first stratify column treatment[usecol[3]],
+        then stratify column treatment[usecol[1]], then
+        matching by Knn distance using rest of unstratified
+        columns
+        
+    enable_log: whether you want to write matching results
+        to log file
+
+    [Returns]
+    ---------
+    Matched control group samples
+    """
     if usecol: # select the columns we gonna use
-        control, treatment = (control.transpose()[usecol].transpose(),
-                              treatment.transpose()[usecol].transpose() )
+        control, treatment = (control.T[usecol].T,
+                              treatment.T[usecol].T )
         
     std_control, std_treatment = prep_standardize(control, treatment) # pre-processing standardization
-
-
+    indices = list()
+    
+    """
+    对于每个treatment_sample，我们按照stratified列的顺序，计算对于被分层的列，control和treatment的距离
+    最后用除去stratified列剩下的列，计算knn距离
+    得到一个 len(stratified_col)+1 x len(control)strat_dist 矩阵。
+    
+    最后我们按照优先分层的列，最后剩下的列的knn距离进行升序排序，这样就可以得到在分层标准下，对于每个
+    treatment_sample得到其matching的control_samples
+    """
+    
+    for treatment_sample in std_treatment: # 对于每个样本
+        strat_dist = np.zeros((len(stratified_col)+1, std_control.shape[0] ) )
+        ## 计算分层的距离
+        for i in range(len(stratified_col)):
+            strat_ind = stratified_col[i] # 取得被分层的列的列标
+            strat_dist[i] = dist(std_control.T[strat_ind][np.newaxis].T, # 计算距离
+                                 [[treatment_sample.T[strat_ind]]]).T[0]
+        ## 计算Knn距离
+        knn_col = list(set(range(len(treatment_sample))).difference(stratified_col) ) # 取得剩下的列标
+        strat_dist[-1] = dist(std_control.T[knn_col].T, #
+                              treatment_sample[knn_col][np.newaxis]).T[0] 
+        ## 按照分层的顺序排序
+        strat_dist_df = pd.DataFrame(strat_dist.T)
+        indices.append(
+                       list( # 把dataframe的index转化成列表
+                            strat_dist_df.sort( # 按照先stratify的列，最后再knn的列的距离升序排列
+                                               columns = list( # range(startify的列数+1)
+                                                              range(len(stratified_col)+1) 
+                                                              ) 
+                                               ).index 
+                            )
+                       )
+    
+    """
+    和普通psm一样，进行index的处理
+    """
+    
+    subcontrol_indice = set() # initial selected control group sample indices
+    
+    for indice, t_sample in zip(indices, treatment): # t_sample = each treatment sample
+        matched_i = list() # 每一个treatment sample 所匹配到的list of control samples
+        
+        for ind in indice:
+            if ind not in subcontrol_indice: # 如果不重复
+                subcontrol_indice.add(ind) 
+                matched_i.append(ind)
+                if len(matched_i) == k: # 对该treatment已经匹配到了足够的control samples
+                    if enable_log:
+                        log.write("%s --matching-- %s" % (t_sample, control[matched_i].tolist()), 
+                                  enable_verbose=False) #
+                    break
+                
+    return control[list(subcontrol_indice)]
+        
 def psm(control, treatment, k, usecol = None, stratified_col = None, enable_log = False):
-    if stratified_col:
+    """Propensity score matching using stratification matching
+    [Args]
+    ------
+    control: control group data
+        control = [sample_1, sample_2, ..., sample_n]
+        sample = [feature1, feature2, ..., feature_k]
+    
+    treatment: treatment group data
+        treatment = [sample_1, sample_2, ..., sample_n]
+        sample = [feature1, feature2, ..., feature_k]
+    
+    k: number of matching sample
+        how many samples been matching from control group
+        for each sample in treatment
+        
+    usecol: the columns indices we will use for matching
+        e.g. [index1, index2, ...]
+    
+    stratified_col:
+        e.g. stratified_col = [3, 1]
+        so we first stratify column treatment[usecol[3]],
+        then stratify column treatment[usecol[1]], then
+        matching by Knn distance using rest of unstratified
+        columns
+        
+    enable_log: whether you want to write matching results
+        to log file
+
+    [Returns]
+    ---------
+    Matched control group samples
+    """
+    if len(treatment.shape) == 1:
+        treatment = treatment[np.newaxis]
+    if stratified_col: # 分层模式
         return psm_stratify(control, treatment, k, 
                             usecol=usecol, 
                             stratified_col=stratified_col, 
                             enable_log=enable_log)
     else: # 不分层模式
-        return psm_none_stratify(control, treatment, k, usecol=usecol, enable_log=enable_log)
-#     if usecol: # select the columns we gonna use
-#         control, treatment = (control.transpose()[usecol].transpose(),
-#                               treatment.transpose()[usecol].transpose() )
-#         
-#     std_control, std_treatment = knn_classifier.prep_standardize(control, treatment) # pre-processing standardization
-#     
-#     _, indices = knn_classifier.knn_find(std_control, # find knn neighbors indices
-#                                          std_treatment, 
-#                                          k = len(std_control) ) # 更大的k值能保证确保匹配到足够的control sample
-#     
-#     ## 分层法解决
-#     layer_indices = list()
-#     for i in range(len(stratified_col) ):
-#         layer_indices.append(knn_classifier.knn_find(std_control.transpose()[[stratified_col[i]]].transpose(),
-#                                                      std_treatment.transpose()[[stratified_col[i]]].transpose(),
-#                                                      k = len(std_control) )[1] )
-# 
-#     print(indices)
-#     for layer_indice in layer_indices:
-#         print(layer_indice)
-        
-    ## 分层解决法
-        
-#     print(treatment)
-#     print(control[367])
-    ### process index; select first kth neighbors for each treatment sample
-#     if enable_log:
-#         log = Log() # initial log
-#         subcontrol_indice = set() # initial selected control group sample indices
-#         
-#         for indice, t_sample in zip(indices, treatment): # t_sample = each treatment sample
-#             matched_i = list() # 每一个treatment sample 所匹配到的list of control samples
-#             
-#             for ind in indice:
-#                 if ind not in subcontrol_indice: # 如果不重复
-#                     subcontrol_indice.add(ind) 
-#                     matched_i.append(ind)
-#                     if len(matched_i) == k: # 对该treatment已经匹配到了足够的control samples
-#                         log.write("%s --matching-- %s" % (t_sample, control[matched_i].tolist()), 
-#                                   enable_verbose=False) #
-#                         break
-#                 
-#         return control[list(subcontrol_indice)]
-    
+        return psm_none_stratify(control, treatment, k, 
+                                 usecol=usecol, 
+                                 enable_log=enable_log)
