@@ -1,0 +1,29 @@
+##################################
+#encoding=utf8                   #
+#version =py27, py33             #
+#author  =sanhe                  #
+#date    =%s             #
+#                                #
+#    (\ (\                       #
+#    ( -.-)o    I am a Rabbit!   #
+#    o_(")(")                    #
+#                                #
+##################################
+    
+"""Description of this scripts
+"""
+    
+from __future__ import print_function
+
+
+
+
+
+
+if __name__ == "__main__":
+    
+    
+    
+    
+    
+    pass

@@ -1,19 +1,34 @@
-##encoding=utf8
-"""
-If you run this file as the main script.
-Then package "HSH" will be installed for all Python version you have installed
-"""
-from __future__ import print_function
+##################################
+#encoding=utf8                   #
+#version =py27, py33             #
+#author  =sanhe                  #
+#date    =2014-10-29             #
+#                                #
+#    (\ (\                       #
+#    ( -.-)o    I am a Rabbit!   #
+#    o_(")(")                    #
+#                                #
+##################################
 
-__all__ = ["LinearSpider"]
+"""
+[En]If you run this file as the main script.
+    Then package "HSH" will be installed for all Python version you have installed
+[Cn]将本脚本作为主脚本运行，会把本脚本所在的package安装到所有用户已安装的python版本的
+    site-packages下。不支持需要C预编译文件的库。
+"""
+
+from __future__ import print_function
+try:
+    from .template import ct
+except:
+    pass
 
 if __name__ == "__main__":
-    import os, shutil
-    
     def install_HSH():
         """
         This script is to install the HSH package to all installed python version
         """
+        import os, shutil
         # get installed python information
         py2_folders, py3_folders = list(), list()
         for _, folders, _ in os.walk(r"C:\\"):
@@ -48,7 +63,9 @@ if __name__ == "__main__":
         # remove currently installed HSH packages and 
         # copy file to site-packages in all python versions
         for pyroot in py2_folders + py3_folders:
-            dst = os.path.join("C:\\", pyroot, r"Lib\site-packages\HSH")
+            dst = os.path.join("C:\\", pyroot, 
+                               r"Lib\site-packages", 
+                               os.path.basename(os.getcwd() ) )
             try: # remove
                 print("Deleting %s" % dst)
                 shutil.rmtree(dst)
@@ -58,5 +75,5 @@ if __name__ == "__main__":
             print("Copying file to %s..." % dst) # copy to
             shutil.copytree(os.path.abspath(os.getcwd() ), 
                             dst)
-         
+
     install_HSH()
