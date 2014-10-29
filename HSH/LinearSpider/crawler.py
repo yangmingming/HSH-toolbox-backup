@@ -1,10 +1,19 @@
-##encoding=utf8
-##version =py27, py34
-##author  =sanhe
-##date    =2014-09-11
+##############################
+#encoding=utf8
+#version =py27, py33
+#author  =sanhe
+#date    =2014-10-18
+#
+#    (\ (\
+#    ( -.-)o    HelloWorld!
+#    o_(")(")
+#
+##############################
 
+"""Http Crawler
+Repack of requests
 """
-"""
+
 from __future__ import print_function
 import requests
 import sys
