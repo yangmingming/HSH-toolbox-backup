@@ -49,13 +49,13 @@ if __name__ == "__main__":
         # copy file to site-packages in all python versions
         for pyroot in py2_folders + py3_folders:
             dst = os.path.join("C:\\", pyroot, r"Lib\site-packages\HSH")
-            try:
+            try: # remove
                 print("Deleting %s" % dst)
                 shutil.rmtree(dst)
             except:
                 pass
              
-            print("Copying file to %s..." % dst)
+            print("Copying file to %s..." % dst) # copy to
             shutil.copytree(os.path.abspath(os.getcwd() ), 
                             dst)
          
