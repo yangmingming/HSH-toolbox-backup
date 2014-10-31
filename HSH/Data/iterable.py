@@ -1,7 +1,15 @@
-##encoding=utf8
-##version =py27, py34
-##author  =sanhe
-##date    =2014-10-12
+##################################
+#encoding=utf8                   #
+#version =py27, py33             #
+#author  =sanhe                  #
+#date    =2014-10-29             #
+#                                #
+#    (\ (\                       #
+#    ( -.-)o    I am a Rabbit!   #
+#    o_(")(")                    #
+#                                #
+##################################
+
 
 """
 This module provides high performance iterator recipes
