@@ -1,7 +1,14 @@
-##encoding=utf8
-##version =py27
-##author  =sanhe
-##date    =2014-10-06
+##################################
+#encoding=utf8                   #
+#version =py27, py33             #
+#author  =sanhe                  #
+#date    =2014-10-31             #
+#                                #
+#    (\ (\                       #
+#    ( -.-)o    I am a Rabbit!   #
+#    o_(")(")                    #
+#                                #
+##################################
 
 """
 [CN]把excel文件中的数据存入数据库的工作流程

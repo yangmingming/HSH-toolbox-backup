@@ -1,6 +1,6 @@
 ##################################
 #encoding=utf8                   #
-#version =py27, py33             #
+#version =py33 only              #
 #author  =sanhe                  #
 #date    =2014-10-29             #
 #                                #
@@ -10,10 +10,16 @@
 #                                #
 ##################################
 
+"""
+注意：在python2中
+import:
+    from built_in_dtypes import SupperSet
+"""
 from __future__ import print_function
 from six import iteritems
 
 class SuperList(object):
+    @staticmethod
     def difference(main_list, compared_list):
         """
         return the result of after removing all item in main_list
@@ -22,6 +28,7 @@ class SuperList(object):
         return list(set(main_list).difference(set(compared_list)))
     
 class SuperSet(object):
+    @staticmethod
     def intersect_all(list_of_set):
         """interesct a list of set
         list_of_set can be a list or a generator object
@@ -35,6 +42,7 @@ class SuperSet(object):
                 res.intersection_update(jihe)
         return res
     
+    @staticmethod
     def union_all(list_of_set):
         """union a list of set
         list_of_set can be a list or a generator object
@@ -66,5 +74,4 @@ if __name__ == "__main__":
         print(SuperSet.union_all([{1,2,3}, 
                                   {2,3,4}, 
                                   {3,5,6}]))
-        
-#     superSet_UT()
+    superSet_UT()

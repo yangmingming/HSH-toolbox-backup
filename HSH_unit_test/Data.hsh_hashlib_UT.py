@@ -1,8 +1,4 @@
 ##encoding=utf8
-##version =py27
-##author  =sanhe
-##date    =2014-09-07
-
 
 from __future__ import print_function
 from HSH.Data.hsh_hashlib import md5_str, md5_obj, md5_file

@@ -9,7 +9,7 @@ import pandas as pd
 
 if __name__ == "__main__":
     def psm_UT():
-        data = pd.read_csv(r"test_data\re78.csv", index_col=0)
+        data = pd.read_csv(r"..\test_data\re78.csv", index_col=0)
         control, treatment = data[data["treat"] == 0].values, data[data["treat"] == 1].values
 
         selected_control = psm(control, 

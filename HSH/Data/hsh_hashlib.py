@@ -19,7 +19,7 @@ This module is re-pack of some hashlib utility functions
 compatible: python2 and python3
 
 usage:
-    from HSH.Data.hsh_hashlib import md5_str, md5_obj, md5_file
+    from HSH.Data.hsh_hashlib import md5_str, md5_obj, md5_file, hash_obj
 """
 
 from __future__ import print_function
@@ -32,7 +32,7 @@ if is_py2:
     pickle_protocol = 2
 else:
     pickle_protocol = 3
-    
+
 def md5_str(text):
     """return md5 value from a STRING
     """
@@ -45,23 +45,8 @@ def md5_obj(obj):
     """
     m = hashlib.md5()
     if is_py2:
-#         print( [pickle.dumps(obj, protocol = 2)] )
         m.update( pickle.dumps(obj, protocol = pickle_protocol) )
     else:
-#         print( [str(pickle.dumps(obj, protocol = 2) )] )
-        m.update( str(pickle.dumps(obj, protocol = pickle_protocol)).encode('utf-8') )
-        
-    return m.hexdigest()
-
-def md5_obj(obj):
-    """return md5 value from a PYTHON OBJECT
-    """
-    m = hashlib.md5()
-    if is_py2:
-#         print( [pickle.dumps(obj, protocol = 2)] )
-        m.update( pickle.dumps(obj, protocol = pickle_protocol) )
-    else:
-#         print( [str(pickle.dumps(obj, protocol = 2) )] )
         m.update( str(pickle.dumps(obj, protocol = pickle_protocol)).encode('utf-8') )
         
     return m.hexdigest()
@@ -89,3 +74,11 @@ def md5_file(fname, chunk_size = 2**10 ):
                 break
             m.update(data)
     return m.hexdigest()
+
+def hash_obj(obj):
+    """return md5 value from a PYTHON OBJECT
+    """
+    if is_py2:
+        return hash( pickle.dumps(obj, protocol = pickle_protocol) )
+    else:
+        return hash( str(pickle.dumps(obj, protocol = pickle_protocol)).encode('utf-8') )
