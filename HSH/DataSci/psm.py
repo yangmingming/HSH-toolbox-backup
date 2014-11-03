@@ -104,10 +104,10 @@ def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
     Matched control group samples
     """
     if usecol: # select the columns we gonna use
-        control, treatment = (control.T[usecol].T,
-                              treatment.T[usecol].T )
+        std_control, std_treatment = (control.T[usecol].T,
+                                      treatment.T[usecol].T )
         
-    std_control, std_treatment = prep_standardize(control, treatment) # pre-processing standardization
+    std_control, std_treatment = prep_standardize(std_control, std_treatment) # pre-processing standardization
     
     _, indices = knn_find(std_control, # find knn neighbors indices
                           std_treatment, 
@@ -118,6 +118,7 @@ def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
     """
     
     subcontrol_indice = set() # initial selected control group sample indices
+    each_matched = list()
     
     for indice, t_sample in zip(indices, treatment): # t_sample = each treatment sample
         matched_i = list() # 每一个treatment sample 所匹配到的list of control samples
@@ -127,12 +128,13 @@ def psm_none_stratify(control, treatment, k, usecol = None, enable_log = False):
                 subcontrol_indice.add(ind) 
                 matched_i.append(ind)
                 if len(matched_i) == k: # 对该treatment已经匹配到了足够的control samples
+                    each_matched.append(control[matched_i].tolist())
                     if enable_log:
                         log.write("%s --matching-- %s" % (t_sample, control[matched_i].tolist()), 
                                   enable_verbose=False) #
                     break
                 
-    return control[list(subcontrol_indice)]
+    return control[list(subcontrol_indice)], treatment.tolist(), each_matched
 
 def psm_stratify(control, treatment, k, usecol = None, stratified_col = None, enable_log = False):
     """Propensity score matching using stratification matching
@@ -168,10 +170,10 @@ def psm_stratify(control, treatment, k, usecol = None, stratified_col = None, en
     Matched control group samples
     """
     if usecol: # select the columns we gonna use
-        control, treatment = (control.T[usecol].T,
-                              treatment.T[usecol].T )
+        std_control, std_treatment = (control.T[usecol].T,
+                                      treatment.T[usecol].T )
         
-    std_control, std_treatment = prep_standardize(control, treatment) # pre-processing standardization
+    std_control, std_treatment = prep_standardize(std_control, std_treatment) # pre-processing standardization
     indices = list()
     
     """
@@ -211,6 +213,7 @@ def psm_stratify(control, treatment, k, usecol = None, stratified_col = None, en
     """
     
     subcontrol_indice = set() # initial selected control group sample indices
+    each_matched = list()
     
     for indice, t_sample in zip(indices, treatment): # t_sample = each treatment sample
         matched_i = list() # 每一个treatment sample 所匹配到的list of control samples
@@ -220,12 +223,13 @@ def psm_stratify(control, treatment, k, usecol = None, stratified_col = None, en
                 subcontrol_indice.add(ind) 
                 matched_i.append(ind)
                 if len(matched_i) == k: # 对该treatment已经匹配到了足够的control samples
+                    each_matched.append(control[matched_i].tolist())
                     if enable_log:
                         log.write("%s --matching-- %s" % (t_sample, control[matched_i].tolist()), 
                                   enable_verbose=False) #
                     break
                 
-    return control[list(subcontrol_indice)]
+    return control[list(subcontrol_indice)], treatment.tolist(), each_matched
         
 def psm(control, treatment, k, usecol = None, stratified_col = None, enable_log = False):
     """Propensity score matching using stratification matching

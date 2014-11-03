@@ -16,10 +16,11 @@ Compatibility:
     python2, python3
 
 Import:
-    from HSH.OS.smtf import getdirsize, string_SizeInBytes, get_dirinfo
+    from HSH.OS.smtf import getdirsize, string_SizeInBytes, get_dirinfo, find_bigass
 """
 
 from __future__ import print_function
+from collections import OrderedDict
 import os
     
 def string_SizeInBytes(size_in_bytes):
@@ -38,7 +39,7 @@ def string_SizeInBytes(size_in_bytes):
     elif kb != 0:
         human_readable_size = "%.2fKB" % (kb + by/float(1024) )
     else:
-        human_readable_size = "%sKB" % by
+        human_readable_size = "%sB" % by
     return human_readable_size
 
 def getdirsize(path):
@@ -77,5 +78,22 @@ def get_dirinfo(path):
             for fname in fnamelist:
                 total += os.path.getsize(os.path.join(current_dir, fname))
         return count_files, count_folders, total
+    else:
+        raise Exception("%s is not a directory!" % path)
+    
+def find_bigass(path, threshold = 0):
+    """查找指定目录下的所有文件夹，如果文件夹纯大小超过门限，则打印
+    """
+    if os.path.isdir(path):
+        stats = dict()
+        count_files, count_folders, total = 0, 0, 0
+        for current_dir, folderlist, fnamelist in os.walk(path):
+            if len(folderlist) == 0:
+                _, _, total = get_dirinfo(current_dir)
+                stats[current_dir] = total
+        od = OrderedDict( sorted(stats.items(), key=lambda t: t[1], reverse = False) )
+        for path, size in od.items():
+            if size >= threshold:
+                print("{0:<10} - {1}".format(string_SizeInBytes(size), path))
     else:
         raise Exception("%s is not a directory!" % path)
