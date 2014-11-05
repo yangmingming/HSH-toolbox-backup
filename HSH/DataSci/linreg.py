@@ -16,9 +16,11 @@ Linear Regression Tool Box
 imoprt:
     from HSH.DataSci.linreg import linreg_predict
 """
-import numpy as np
+
+from __future__ import print_function
 from sklearn.linear_model import LinearRegression
 from matplotlib import pyplot as plt
+import numpy as np
 
 def glance_2d(x, y):
     """多元线性回归一瞥
@@ -41,7 +43,7 @@ def glance_2d(x, y):
     plt.show()
 
 def linreg_predict(X, y, X1):
-    """多元线性回归预测
+    """多元线性回归预测器
     """
     if type(X) != np.ndarray:   # 如果x不是np.ndarray
         X = np.array(X)         # 则转换成np.ndarray
@@ -55,8 +57,20 @@ def linreg_predict(X, y, X1):
     clf.fit(X,y)
     return clf.predict(X1) 
 
+def linreg_coef(X, y):
+    """多元线性回归预测器
+    """
+    if type(X) != np.ndarray:   # 如果x不是np.ndarray
+        X = np.array(X)         # 则转换成np.ndarray
+    if len(X.shape) == 1:       # 如果是一维行向量
+        X = X[np.newaxis].transpose()   # 转化成列向量
+    clf = LinearRegression()
+    clf.fit(X,y)
+    return clf.intercept_, clf.coef_
+
 if __name__ == "__main__":
     x = np.array([1,2,3,4,5,6,7,8,9,10])
     y = [3.4, 5.4, 4.3, 2.1, 7.8, 9.2, 11.4, 14.5, 17.3, 19.3]
     glance_2d(x,y)
     print(linreg_predict(x, y, x))
+    print(linreg_coef(x, y))

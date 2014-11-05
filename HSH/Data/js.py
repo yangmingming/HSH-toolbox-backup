@@ -15,9 +15,10 @@ This module is re-pack of some json utility functions
     1. load json object from file
     2. dump json object to file. Replace existing file when replace = True
     3. pretty print json object
-    4. transform a dict data to jsontree object
+    
+compatibility: python2 and python3
 
-compatible: python2 and python3
+prerequisites: None
 
 import:
     from HSH.Data.js import load_js, dump_js, prt_js
