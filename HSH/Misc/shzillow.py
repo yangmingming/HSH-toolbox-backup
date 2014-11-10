@@ -17,7 +17,11 @@ Import:
     from HSH.Misc.shzillow import zillow_property_detail
 """
 from __future__ import print_function
-from ..LinearSpider.crawler import Crawler
+try:
+    from ..LinearSpider.crawler import Crawler
+except:
+    from HSH.LinearSpider.crawler import Crawler
+    
 from bs4 import BeautifulSoup as BS4
 
 class HttpError(Exception):

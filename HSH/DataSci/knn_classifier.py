@@ -11,7 +11,8 @@
 ##################################
 
 """
-
+Import:
+    from HSH.DataSci.knn_classifier import dist, knn_find
 """
 
 from __future__ import print_function
@@ -20,10 +21,30 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import preprocessing
 
-def dist(X, Y):
+def dist(X, Y, distance_function = "euclidean"):
     """calculate X, Y distance matrix
+    [Args]
+    ------
+    X : m samples
+    Y : n samples
+    distance_function : user_defined distance
+    
+    [Returns]
+    ---------
+    distance_matrix: n * m distance matrix
+    
+    
+    we have those built-in function. Default = euclidean
+    
+    "euclidean"    EuclideanDistance    sqrt(sum((x - y)^2))
+    "manhattan"    ManhattanDistance    sum(|x - y|)
+    "chebyshev"    ChebyshevDistance    sum(max(|x - y|))
+    "minkowski"    MinkowskiDistance    sum(|x - y|^p)^(1/p)
+    "wminkowski"    WMinkowskiDistance    sum(w * |x - y|^p)^(1/p)
+    "seuclidean"    SEuclideanDistance    sqrt(sum((x - y)^2 / V))
+    "mahalanobis"    MahalanobisDistance    sqrt((x - y)' V^-1 (x - y))
     """
-    distance_calculator = DistanceMetric.get_metric("euclidean")
+    distance_calculator = DistanceMetric.get_metric(distance_function)
     return distance_calculator.pairwise(X, Y)
 
 def knn_find(train, test, k = 2):
@@ -106,8 +127,14 @@ if __name__ == "__main__":
     def dist_UT():
         train, test = ([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]], 
                        [[0,0], [1,1]])
+        
+        train, test = ([[1], 
+                        [2],
+                        [3]],
+                       [[1]])
         distances = dist(train, test)
         print("=== distance matrix ===\n%s\n" % distances)
+        
         
     dist_UT()
     
@@ -118,7 +145,7 @@ if __name__ == "__main__":
         print("=== distance matrix ===\n%s\n" % distances)
         print("=== indices matrix ===\n%s\n" % indices)
         
-    knn_find_UT()
+#     knn_find_UT()
 
     def knn_classify_UT():
         import pandas as pd
@@ -129,5 +156,5 @@ if __name__ == "__main__":
         test_label = knn_classify(train, train_label, test, k=1)
         print(test_label)
         
-    knn_classify_UT()
+#     knn_classify_UT()
         
