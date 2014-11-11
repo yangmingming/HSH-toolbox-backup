@@ -20,6 +20,7 @@ from sklearn.neighbors import DistanceMetric
 from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import preprocessing
+import numpy as np
 
 def dist(X, Y, distance_function = "euclidean"):
     """calculate X, Y distance matrix
@@ -52,13 +53,13 @@ def knn_find(train, test, k = 2):
     
     [Args]
     ----
-    train: train data
+    train: train data {array like, m x n, m samples, n features}
         list of sample, each sample are list of features.
         e.g. [[age = 18, weight = 120, height = 167],
               [age = 45, weight = 180, height = 173],
               ..., ]
         
-    test: test data
+    test: test data {array like, m x n, m samples, n features}
         data format is the same as train data
     
     k: number of neighbors
@@ -98,9 +99,9 @@ def knn_classify(train, train_label, test, k=1, standardize=True):
     
     [Args]
     ------
-    train: train data (see knn_find)
+    train: train data (see knn_find), {array like, m x n, m samples, n features}
     
-    train_label: train data's label
+    train_label: train data's label, {array like, m x n, m samples, n features}
     
     test: test data
     
@@ -123,6 +124,45 @@ def knn_classify(train, train_label, test, k=1, standardize=True):
     neigh.fit(train, train_label) # training
     return neigh.predict(test) # classifying
 
+def knn_impute(train, k):
+    """nearest neighbor data imputation algorithm
+    [Args]
+    ------
+    train: data set with missing value, {array like, m x n, m samples, n features}
+    
+    k: use the first k nearest neighbors' mean to fill the missing-value cell
+    
+    [Returns]
+    ---------
+    train: with filled missing value
+    
+    """
+    for i in np.where(np.isnan(train).sum(axis=1)!=0)[0]: # for the row has NA value
+        sample = train[i] # i = row index, sample = ith sample in train
+        na_col_ind, usable_col_ind = (np.where(np.isnan(sample) )[0], # NA value column index
+                                      np.where(~np.isnan(sample))[0]) # Non-NA value column index 
+        usable_row_ind = np.where(np.isnan(train[:, usable_col_ind]).sum(axis=1)==0)[0]
+                             # Non-NA row index if in Non-NA value column index has no NA value
+        
+        sub_train = train[np.ix_(usable_row_ind, usable_col_ind)] # select sub data set
+        scaler = preprocessing.StandardScaler().fit(sub_train) # find the mean and var to remove
+        
+        if k**2 > sub_train.shape[0]: # usually to ensure we have more than k non-va value 
+            potential_k = sub_train.shape[0] # we have to find k**2 nearest neighboor
+        else:
+            potential_k = k ** 2
+              
+        _, indices = knn_find(scaler.transform(sub_train), # standardize
+                              scaler.transform(sample[usable_col_ind][np.newaxis]), # standardize
+                              potential_k)
+ 
+        candidates = train[np.ix_(usable_row_ind[indices[0]], na_col_ind)].T
+         
+        for j, candidate in enumerate(candidates): # use the average of first k non-NA value 
+            train[(i, na_col_ind[j])] = candidate[~np.isnan(candidate)][:k+1].mean()
+    
+    return train
+
 if __name__ == "__main__":
     def dist_UT():
         train, test = ([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]], 
@@ -135,8 +175,7 @@ if __name__ == "__main__":
         distances = dist(train, test)
         print("=== distance matrix ===\n%s\n" % distances)
         
-        
-    dist_UT()
+#     dist_UT()
     
     def knn_find_UT():
         train, test = ([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]], 
@@ -157,4 +196,23 @@ if __name__ == "__main__":
         print(test_label)
         
 #     knn_classify_UT()
+    
+    def knn_impute_UT():
+        import pandas as pd
+        import time
+        train_data = pd.read_csv(r"demo_data\copd_1000_missing.txt", header=None)
         
+        ## === time complexity test
+        st = time.clock()
+        filled_data = knn_impute(train_data.values, 5)
+        print(time.clock() - st)
+        ## === compare original value and filled value ===
+        filled_ind = np.where(np.isnan(train_data.values))
+        
+        origin = pd.read_csv(r"demo_data\copd_1000.txt", header=None).values[filled_ind]
+        predict = filled_data[filled_ind]
+        print(origin)
+        print(predict)
+        print(abs(origin-predict)/predict)
+        
+#     knn_impute_UT()
