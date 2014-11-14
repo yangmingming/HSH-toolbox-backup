@@ -68,9 +68,10 @@ def unit_test4():
         print(i)
         
     print("Testing cycle running windows")
-    for i in cycle_running_windows(array, 3):
+    for i in cycle_running_windows(array, 1):
         print(i)
     
+    print("Testing cycle slice")
     print(cycle_slice(array, 3, 6) )
     print(cycle_slice(array, 6, 3) )
                 
@@ -78,4 +79,4 @@ if __name__ == "__main__":
 #     unit_test1()
 #     unit_test2()
 #     unit_test3()
-#     unit_test4()
+    unit_test4()

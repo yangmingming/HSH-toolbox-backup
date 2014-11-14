@@ -105,14 +105,17 @@ def cycle_running_windows(iterable, size):
             if next(counter) == length:
                 break
 
-def cycle_slice(array, start, end):
+def cycle_slice(LIST, start, end):
     """given a list, return right hand cycle direction slice from start to end
     e.g.
         array = [0,1,2,3,4,5,6,7,8,9]
         cycle_slice(array, 4, 7) -> [4,5,6,7]
         cycle_slice(array, 8, 2) -> [8,9,0,1,2]
     """
+    if type(LIST) != list:
+        LIST = list(LIST)
+        
     if end >= start:
-        return array[start:end+1]
+        return LIST[start:end+1]
     else:
-        return array[start:] + array[:end+1]
+        return LIST[start:] + LIST[:end+1]
